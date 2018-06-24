@@ -19,8 +19,8 @@ import com.xml_web_services.spring_services.ReviewService;
 
 @RestController
 @RequestMapping("/review")
-@CrossOrigin(origins = {"http://localhost:8081","http://localhost:8081", "http://localhost:8082",
-"http://localhost:8082"}, maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8081",
+"http://localhost:8082", "http://localhost:8088"}, maxAge = 3600, allowCredentials = "true")
 public class ReviewController {
 
 	@Autowired

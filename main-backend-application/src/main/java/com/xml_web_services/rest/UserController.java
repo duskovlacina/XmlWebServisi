@@ -21,32 +21,23 @@ import com.xml_web_services.spring_services.UserService;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"http://localhost:8081","http://localhost:8081", "http://localhost:8082",
-"http://localhost:8082"}, maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8081",
+"http://localhost:8082", "http://localhost:8088"}, maxAge = 3600, allowCredentials = "true")
 public class UserController {
 
 	@Autowired
 	private UserService userService;
 	
-	/*@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public ResponseEntity<User> login(@RequestBody User user, HttpServletRequest request,  @RequestParam String u) {
+	@RequestMapping(value = "/loginUser", method = RequestMethod.POST)
+	public ResponseEntity<User> loginUser(@RequestBody User user, HttpServletRequest request) {
 		User us = this.userService.find(user);
-		System.out.println("STATSAT " + u);
 		if (us != null && us.getUserStatus().equals("ACTIVATED")) {
-			System.out.println(us.getUserType());
-			if (us.getUserType().equals("ADMIN")&& u.equals("admin")) {
-				request.getSession().setAttribute("admin", us);
-				System.out.println("FSAFSAFSAFSAFSAFAS !!");
-				return new ResponseEntity<>(HttpStatus.OK);
-			}else if (us.getUserType().equals("USER") && u.equals("user")) {
-				request.getSession().setAttribute("user", us);
-				return new ResponseEntity<>(HttpStatus.OK);
-			} 
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			request.getSession().setAttribute("user", us);
+			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
-	*/
+	
 	@RequestMapping(value = "/loginAdmin", method = RequestMethod.POST)
 	public ResponseEntity<User> loginAdmin(@RequestBody User user, HttpServletRequest request) {
 		User us = this.userService.find(user);
@@ -111,7 +102,6 @@ public class UserController {
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<User> delete(@PathVariable long id) {
-		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAA@@@@@@@@@@@@@@@@@@@@");
 		boolean flag = this.userService.deleteUser(id);
 		if (flag) {
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -120,18 +110,6 @@ public class UserController {
 		}
 	}
 	
-	// TODO: should be put
-	// should be put with pathvariable
-	@RequestMapping(value = "/decline", method = RequestMethod.POST)
-	public ResponseEntity<User> decline(@RequestBody String id) {
-		boolean flag = this.userService.setStatus(id.substring(0, id.length()-1), "DECLINED");
-		if (flag) {
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-	}
-	// TODO : change !
 	@RequestMapping(value = "/block/{id}", method = RequestMethod.GET)
 	public ResponseEntity<User> decline(@PathVariable long id) {
 		boolean b = this.userService.blockUser(id);
