@@ -57,9 +57,6 @@ public class AgentService {
 	private ReviewRepository reviewRepository;
 	
 	@Autowired
-	private AccomodationSoapClient accomodationClient;
-	
-	@Autowired
 	private MessageSoapClient messageClient;
 	
 	@Autowired
@@ -96,6 +93,7 @@ public class AgentService {
 			message.setMessagText(msg.getMessagText());
 			message.setReaded(false);
 			message.setUser(msg.getUser());
+			message.setReplyId(message.getMessageId());
 			this.messageRepository.save(message);
 		}
 	}
@@ -125,8 +123,9 @@ public class AgentService {
 		GetAgentReviewsResponse reviewResponse = this.reviewClient.getReviews(agent);
 		for (Review r: reviewResponse.getReviews()) {
 			Review review = new Review();
+			System.out.println("ACOMODATIONNNNNNNNNNNN NAMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+			System.out.println(r.getAccomodation().getName());
 			review.setAccomodation(this.accomodationRepository.findByName(r.getAccomodation().getName()));
-			
 			review.setReviewText(r.getReviewText());
 			review.setConfirmed(r.isConfirmed());
 			review.setUserId(r.getUserId());
@@ -138,7 +137,6 @@ public class AgentService {
 	
 	private void synchronizeCategories() {
 		GetAllAccomodationCategoriesResponse accomodationCategoryResponse = accomCategoryClient.getAccomodationCategories(0L);
-		System.out.println("SYNC CATEGORIES " + accomodationCategoryResponse.getAccomodationCategory().size());
 		for (AccomodationCategory ac: accomodationCategoryResponse.getAccomodationCategory()) {
 			AccomodationCategory accomodationCategory = this.accomodationCategoryRepository.findByCategoryName(ac.getCategoryName());
 			if (accomodationCategory == null) { 
@@ -150,7 +148,6 @@ public class AgentService {
 	}
 	
 	private void synchronizeTypes() {
-		System.out.println("SYNCC TYPESSSS ");
 		GetAllAccomodationTypeResponse getAllAccomodationTypeResponse = accomTypeClient.getAccomodationType(0L);
 		System.out.println(getAllAccomodationTypeResponse.getAccomodationType().size());
 		for (AccomodationType ac: getAllAccomodationTypeResponse.getAccomodationType()) {

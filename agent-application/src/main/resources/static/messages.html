@@ -1,4 +1,4 @@
-<html xmlns:th="http://www.thymeleaf.org" class="js">
+<html xmlns:th="http://www.thymeleaf.org" class="htmlShown">
 
 <head>
     <title>Booking</title>
@@ -25,14 +25,13 @@
 		}
 	</style>
 	
-	<link rel="stylesheet" type="text/css" href="style/index.css">
 	
 	<script>
 		  $(document).ready(function() {	
 			  $.ajax({
 					url:'/agent/account',
-					type:'get',
 					async:false,
+					type:'get',
 					complete:function(data, textStatus){
 						var d = data.status;
 						if (d == 200){
@@ -43,13 +42,17 @@
 					error:function(){}
 				 }); 
 			 
+			  
+			  
 			 $.ajax({
 					url:'/message',
-					type:'get',
 					async:false,
+					type:'get',
 					complete:function(data, textStatus){
 						var d = data.status;
 						if (d == 200){
+							console.log('IDEMOOOOOOOOOOOOOOOOOOOOOOO');
+							console.log(data.responseJSON);
 							var div = document.getElementById('table-body'); 
 							for(var i = 0; i < data.responseJSON.length; i++) {
 								div.innerHTML = div.innerHTML + 
@@ -57,12 +60,12 @@
 		                        "<td class=\"col-sm-8 col-md-6\">"+
 		                       " <div class=\"media\">"+
 		                           " <div class=\"media-body\">"+
-		                             "  <h4 class=\"media-heading\"> <strong>Message </strong>: "+data.responseJSON[i].msgContent+"</h4>"+
+		                             "  <h4 class=\"media-heading\"> <strong>Message </strong>: "+data.responseJSON[i].messagText+"</h4>"+
 		                            "</div>"+
 		                        "</div></td>"+
 		                       " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
 		                       " </td>"+
-		                       " <td class=\"col-sm-1 col-md-1 text-center\"><button onclick=\"reply('"+data.responseJSON[i].serverId+"')\" class=\"btn btn-primary\">Reply</button></td>"+
+		                       " <td class=\"col-sm-1 col-md-1 text-center\"><button onclick=\"reply('"+data.responseJSON[i].replyId+"')\" class=\"btn btn-primary\">Reply</button></td>"+
 		                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong></td>"+
 		                       " <td class=\"col-sm-1 col-md-1\">"+
 		                       " </td>"+
@@ -74,23 +77,20 @@
 					error:function(){}
 				 }); 
 			 
-			$("html").removeClass('js');
+			$("html").removeClass('htmlShown');
 		}); 
 		  
-		function reply(messageId) {
-			document.getElementById("messageId").value = messageId;
-			 $("#replyModal").modal();
-		}
 		
-		function sendReply(){
+		
+		function sendMessageReply(){
 			 var msgServerId = document.getElementById("messageId").value;
 			 var msgContent = document.getElementById("replyMsg").value;
 			 var reply = {
-				 msgId: msgServerId,
-				 replyContent: msgContent
+				 messageId: msgServerId,
+				 messagText: msgContent
 			 }
 			 $.ajax({
-					url:'/reply',
+					url:'/message/reply',
 					type:'post',
 					data: JSON.stringify(reply),
 					contentType:"application/json",
@@ -109,8 +109,13 @@
 				 }); 
 		}
 		
+		function reply(messageId) {
+			document.getElementById("messageId").value = messageId;
+			 $("#replyModal").modal();
+		}
+		
 		function logout() {
-			var r = confirm("Are you sure?");
+			var r = confirm("Loging out?");
 			if (r == true) {
 				$.ajax({
 					url:'/agent/logout',
@@ -189,7 +194,7 @@
 		          	<div class="row" style="width: 400px;">
 						<div class="col-md-12" style="margin-top:2%;width:400px;">
 							<div class="form-group" style="width:400px;">
-								<input style="margin-left:100px;width:350px;height: 50px;" id="replyMsg" name="replyMsg" 
+								<input style="margin-left:100px;width:350px;height: 50px;" id="messagText" name="messagText" 
 									type="text" placeholder="Reply message"/>
 							</div>
 						</div>
@@ -197,7 +202,7 @@
 		          </form>
 		        </div>
 		        <div class="modal-footer">
-		          <button type="button" class="btn btn-primary" onclick="sendReply()"> 
+		          <button type="button" class="btn btn-primary" onclick="sendMessageReply()"> 
 		          <!-- data-dismiss="modal" -->
 		          Save</button>
 		        </div>
