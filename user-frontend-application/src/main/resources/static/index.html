@@ -40,12 +40,10 @@
 					async:false,
 					complete:function(data, textStatus){
 						var d = data.status;
-						$(".sort").hide();
 						if (d == 200){
 							var d = JSON.parse(data.responseText);
-							$(".logged").show();
 							$(".notlogged").hide();
-							
+							$(".logged").show();
 							if(d.userType == "USER") {
 								$(".user").show();
 								$(".admin").hide();
@@ -85,6 +83,9 @@
 				error:function(){}
 			 }); 
 			
+			 
+			 
+			 
 			$.ajax({
 				url:'http://localhost:8080/accomodation-category',
 				type:'get',
@@ -129,7 +130,7 @@
 				            "    <h4>Description:</h4>"+ data.responseJSON[i].description+
 				            "  </td>"+
 				            " <td>"+
-				            " <a class=\"btn btn-success\" href=\"accomodation-details.html?id="+data.responseJSON[i].id+"\">Accomodation details</a>"
+				            " <a class=\"btn btn-success\" href=\"accomodation-details.html?id="+data.responseJSON[i].accomodationId+"\">Accomodation details</a>"
 				            "  </td>"+
 			            		"</tr>";
 						}
@@ -239,7 +240,6 @@
 	                       }
 	                       div.innerHTML = div.innerHTML + "</tr>";
 						} 
-						 $(".sort").show();
 					} else if (d == 400) {
 					}
 				},
@@ -468,24 +468,15 @@
 	                        <th></th>
 	                        <th class="text-center"></th>
 	                        <th class="text-center"></th>
-	                        <th><div class="dropdown">
-							  <!-- <button onclick="myFunction()" class="dropbtn btn btn-info  sort">Sort by </button>
-							  <div id="myDropdown" class="dropdown-content">
-							    <a onclick="sort('price')">Price</a>
-							    <a onclick="sort('raiting')">Raiting</a>
-							    <a onclick="sort('category')">Category</a>
-							  </div>
-							</div>--> </th>
-	                    </tr>
+	                        <th></tr>
 	                </thead>
 	                <tbody id="table-body">
 	                </tbody>
 	            </table>
 	            </div>
-	            </div>
-	            </div>
-	        </div>
-    </div>
+            </div>
+         </div>
+	</div>
 </div>
 	
 </body>

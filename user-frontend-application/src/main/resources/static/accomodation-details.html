@@ -1,10 +1,11 @@
-<html class="js">
+<html class="htmlShown">
 <head>
     <title>Booking</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <!--  ==================================== JQUERY AD BOOTSTRAP ======================================================= -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -14,7 +15,6 @@
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	
-	<!--  ==================================== JQUERY AD BOOTSTRAP ======================================================= -->
 	
 <style>
 </style>
@@ -33,7 +33,6 @@
 			complete:function(data, textStatus){
 				var d = data.status;
 				if (d == 200){
-					}
 				}else if(d == 404) {
 					window.location.href="/";s
 				}
@@ -41,11 +40,46 @@
 		});
 		
 		
-		var imgDiv = document.getElementById('imgDiv'); 
+		$.ajax({
+			url:'http://localhost:8080/review/'+getRouteParam("id"),
+			type:'get',
+			async:false,
+			headers: {  'Access-Control-Allow-Origin': '*' },
+	        xhrFields: {
+	            withCredentials: true
+	         },
+	         crossDomain: true,
+			complete:function(data, textStatus){
+				var d = data.status;
+				console.log(data.responseJSON);
+				if (d == 200){
+					var div = document.getElementById('table-body2'); 
+					for(var i = 0; i < data.responseJSON.length; i++) {
+						div.innerHTML = div.innerHTML + 
+						 "<tr id=\"reivew"+data.responseJSON[i].id+"\">"+
+                        "<td class=\"col-sm-8 col-md-6\">"+
+                       " <div class=\"media\">"+
+                           " <div class=\"media-body\">"+
+                             "  <h4 class=\"media-heading\"> <strong>Comment text </strong>: "+data.responseJSON[i].reviewText+"</h4>"+
+                             "  <h4 class=\"media-heading\"> <strong>Grade </strong>: "+data.responseJSON[i].grade+"</h4>"+
+                            "</div>"+
+                        "</div></td>"+
+                       " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
+                       " </td>"+
+                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong></td>"+
+                       " <td class=\"col-sm-1 col-md-1\">"+
+                       " </td>"+
+                    "</tr><hr>";
+					}
+				}
+			}
+		 }); 
+	
+		
 		
 		
 		$.ajax({
-			url:'http://localhost:8080/accomodation/'+findGetParameter("id"),
+			url:'http://localhost:8080/accomodation/'+getRouteParam("id"),
 			type:'get',
 			async:false,
 			crossDomain: true,
@@ -56,8 +90,6 @@
 			complete:function(data, textStatus){
 				var d = data.status;
 				if (d == 200){
-					var d = data.status;
-					if (d == 200){
 						var div = document.getElementById('table-body'); 
 						div.innerHTML = div.innerHTML + 
 						 "<tr>"+
@@ -67,84 +99,42 @@
                       	"<h4 class=\"media-heading\" style=\"margin-left:50px;\">  <strong>"+data.responseJSON.name+"</strong></h4>"+
                        "</td>"+
                        " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
-                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.address.country +"</h5>"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.country +"</h5>"+
                        " </td>"+
                        " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong>"+
-                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.address.city+"</h5>"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.city+"</h5>"+
                        "</td>"+
                        " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong>"+
-                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.address.street+"</h5>"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.street+"</h5>"+
                        "</td>"+
                        " <td class=\"col-sm-1 col-md-1\">"+
-                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.address.streetNumber+"</h5>"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.streetNumber+"</h5>"+
                        " </td>"+
                        " <td class=\"col-sm-1 col-md-1\">"+
-                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.rate+"</h5>"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.grade+"</h5>"+
                        " </td>"+
 	                    "</tr>";
 	                    
-						imgDiv.innerHTML = imgDiv.innerHTML + "<img style=\"width:180px;height:200px;\" src=\""+data.responseJSON.images[0].imageUrl+"\">"; 
-					}else if(d == 404) {
-					}
-				}else if(d == 404) {
-					
 				}
-			},
-			error:function(){}
+			}
 		 });
 		
-			$.ajax({
-				url:'http://localhost:8080/review/'+findGetParameter("id"),
-				type:'get',
-				async:false,
-				crossDomain: true,
-		        xhrFields: {
-		            withCredentials: true
-		         },
-		        headers: {  'Access-Control-Allow-Origin': '*' },
-				complete:function(data, textStatus){
-					var d = data.status;
-					if (d == 200){
-						var div = document.getElementById('table-body2'); 
-						div = "";
-						for(var i = 0; i < data.responseJSON.length; i++) {
-							div.innerHTML = div.innerHTML + 
-							 "<tr id=\"reivew"+data.responseJSON[i].id+"\">"+
-	                        "<td class=\"col-sm-8 col-md-6\">"+
-	                       " <div class=\"media\">"+
-	                           " <div class=\"media-body\">"+
-	                             "  <h4 class=\"media-heading\"> <strong>Comment text </strong>: "+data.responseJSON[i].comment+"</h4>"+
-	                             "  <h4 class=\"media-heading\"> <strong>Grade </strong>: "+data.responseJSON[i].grade+"</h4>"+
-	                            "</div>"+
-	                        "</div></td>"+
-	                       " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
-	                       " </td>"+
-	                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong></td>"+
-	                       " <td class=\"col-sm-1 col-md-1\">"+
-	                       " </td>"+
-	                    "</tr><hr>";
-						}
-					}else if(d == 404) {
-					}
-				},
-				error:function(){}
-			 }); 
-		
-		
-		$("html").removeClass('js');
+		$("html").removeClass('htmlShown');
 	})
 	
 	
-	function findGetParameter(parameterName) {
+	function getRouteParam(parameterName) {
 	    var result = null,
-	        tmp = [];
+        tmp = [];
+	    
 	    location.search
 	        .substr(1)
 	        .split("&")
 	        .forEach(function (item) {
 	          tmp = item.split("=");
 	          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-	        });
+        });
+	    
 	    return result;
 	}
 	
@@ -168,25 +158,6 @@
 		}
 	}
 	
-	function check() {
-		var d1 = document.getElementById('rateInput').value;
-		var d2 = document.getElementById('commentTxt').value;
-		
-		var btn = document.getElementById('leaveReviewButton').value;
-		
-		var startDate = new Date(d1);
-		var endDate = new Date(d2);
-		console.log(d1);
-		console.log(d2);
-		console.log(d1 == '');
-		console.log(d1 == null);
-		if (d1 == '' || d2 == '') {
-			btn.disabled = true;
-		}else {
-			$('#leaveReviewButton').removeAttr('disabled');
-			
-		}
-	}
 </script>
 </head>
 <body>
@@ -211,13 +182,9 @@
 			    </div>
 			</nav>
 		</div>
-		<div class="row" style="margin-top: 60px;">
-	    	<div class="col-md-3">
-	    		<div class="col-lg-12" id="imgDiv">
-	    			
-	    		</div>
-	    	</div>
-	    	<div class="col-md-9" >
+		<div class=row>
+		<div class="col-md-offset-2 col-md-8" style="margin-top: 60px;">
+	    	<div class="col-md-12" >
 	    		<div class="col-lg-12">
 	    			 <table class="table table-hover" id="table-content">
 		                <thead>
@@ -239,7 +206,9 @@
 	    		</div>
 	    	</div>
     	</div>
-    	<div class="row" style="margin-top:50px;">
+    	</div>
+    	<div class= "row">
+    	<div class="col-md-offset-2 col-md-8" style="margin-top:50px;">
 	        <div class="col-sm-12 col-md-10 col-md-offset-1">
 	            <table class="table table-hover">
 	                <thead>
@@ -256,7 +225,7 @@
 	            </table>
 	        </div>
     	</div>
-    	
+    	</div>
 	</div>
 
 </body>
