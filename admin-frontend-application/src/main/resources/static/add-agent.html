@@ -1,0 +1,121 @@
+<html>
+<head>
+
+<head>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>	
+	
+	<!-- JQuery link -->
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	
+	<style>
+	body{
+		background: #2c3e50;
+	}
+	
+	</style>
+	<script>
+		 $(document).on("change", "#username", function() { 
+			 $.ajax({
+				 url:'http://localhost:8080/user/account?u=admin',
+				type:'get',
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				async:false,
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+					}else if(d == 404) {
+						window.location.href="/";
+					}
+				},
+				error:function(){}
+			 });
+		});	 
+			
+	</script>
+
+
+<head>
+<body style="background-color: grey">
+	<script>
+		$(document).ready(function(){
+			$("#submitButton").click(function(){
+				var agent = {
+				 		username: $("#username").val(),
+						password: $("#password1").val(),
+						businessID: $("#businessId").val(),
+						firstName: $("#name").val(),
+						lastName: $("#surname").val(),
+				}
+				
+				$.ajax({
+					url:'http://localhost:8080/agent',
+					type:'post',
+					data: JSON.stringify(agent),
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					contentType:"application/json",
+					dataType:"json",
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 201){
+							alert("Agent created!")
+							window.location.href="home.html";				
+						}else if(d == 400) {
+							// bad request
+						}
+					},
+					error:function(){}
+				 }); 
+			});
+		});
+	
+	</script>
+
+			<div class="col-md-offset-4 col-md-4">
+				<h1 class="text-center">Create agent</h1>
+				<form id="registerform">
+				
+					<div class="form-group">
+						<input type="text" name="username" id="username" class="form-control input-sm" placeholder="Username">
+					</div>
+
+					<div class="form-group">
+						<input type="password" name="password1" id="password1" class="form-control input-sm" placeholder="Password">
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<input type="text" name="name" id="name" class="form-control input-sm" placeholder="First Name">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<input type="text" name="surname" id="surname" class="form-control input-sm" placeholder="Last Name">
+							</div>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<input type="text" name="businessId" id="businessId" class="form-control input-sm" placeholder="Business ID">
+					</div>
+				</form>
+				<button id="submitButton" value="Add" class="btn btn-success btn-lg btn-block">Create</button>
+			</div>
+						
+</body>
+</html>

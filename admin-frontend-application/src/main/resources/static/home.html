@@ -1,0 +1,381 @@
+<html xmlns:th="http://www.thymeleaf.org" class="shown">
+
+<head>
+    <title>Booking</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <!--  ==================================== JQUERY AD BOOTSTRAP ======================================================= -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	
+	<!--  ==================================== JQUERY AD BOOTSTRAP ======================================================= -->
+	
+	
+	<style>
+		a{
+			cursor: pointer
+		}
+		li{
+			cursor: pointer
+		}
+		
+		html.js{
+			display: none
+		}
+	</style>
+	
+	<script>
+	 $(document).ready(function() {	
+		   $.ajax({
+				url:'http://localhost:8080/user/account?u=admin',
+				type:'get',
+				headers: {  'Access-Control-Allow-Origin': '*' },
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+				async:false,
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+					}else if(d == 404) {
+						window.location.href="/";
+					}
+				},
+				error:function(){}
+			 });
+			 
+		    	$.ajax({
+					url:'http://localhost:8080/user/not-activated',
+					type:'get',
+					crossDomain: true,
+					vheaders: {  'Access-Control-Allow-Origin': '*' },
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        
+					async:false,
+					complete:function(data, textStatus){
+						var div = document.getElementById('notActivated'); 
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML +
+							"<div class=\"col-md-12 \" id=\"user"+data.responseJSON[i].id+"\">" + 
+				              "<div class=\"row\">" +
+				                "<div class=\"list-group-item\">"+
+				                  "<div class=\"thumbnail\">"+
+				                    "<div class=\"row\">"+
+				                      "<div class=\"col-sm-12\">"+
+				                        "<div>"+
+				                          "<div class=\"panel panel-default\">"+
+				                            "<div class=\"panel-heading\">Name:" +data.responseJSON[i].firstName+"</div>"+
+				                            "<div class=\"panel-body\">Surname:"+ data.responseJSON[i].lastName+"</div>"+
+				                            "<div class=\"panel-footer\">Email:" +data.responseJSON[i].email+"</div>"+
+				                            "<br>"+
+				                            "<div align=\"center\" style=\"padding-bottom: 20px\">"+
+				                              "<button type=\"button\" class=\"btn btn-success norMouse\" onclick=\"approve('"+data.responseJSON[i].id+"')\"> Approve <span"+
+				                                "class=\"glyphicon glyphicon-ok\"> </span></button>"+
+				                              "&nbsp;&nbsp;&nbsp;"+
+				                              "<button class=\"btn btn-danger\" onclick=\"decline('"+data.responseJSON[i].userId+"')\"> Decline <span"+
+				                                "class=\"glyphicon glyphicon-trash\"> </span></button>"+
+				                              "&nbsp;&nbsp;&nbsp;"+
+				                            "</div>"+
+				                          "</div>"+
+				                        "</div>"+
+				                      "</div>"+
+				                    "</div>"+
+				                  "</div>"+
+				                "</div>"+
+				              "</div>"+
+				            "</div>";
+						}
+					},
+					error:function(){}
+				 });
+				
+				
+		    	$.ajax({
+					url:'http://localhost:8080/review/pending',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					async:false,
+					complete:function(data, textStatus){
+						var div = document.getElementById('reviews'); 
+						console.log(data);
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML +
+							"<div class=\"col-md-12 \" id=\"review"+data.responseJSON[i].id+"\">" + 
+				              "<div class=\"row\">" +
+				                "<div class=\"list-group-item\">"+
+				                  "<div class=\"thumbnail\">"+
+				                    "<div class=\"row\">"+
+				                      "<div class=\"col-sm-12\">"+
+				                        "<div>"+
+				                          "<div class=\"panel panel-default\">"+
+				                            "<div class=\"panel-heading\">Comment:" +data.responseJSON[i].comment+"</div>"+
+				                            "<div class=\"panel-body\">Grade:"+ data.responseJSON[i].grade+"</div>"+
+				                            "<div class=\"panel-footer\">Accomodation name:" +data.responseJSON[i].accomodation.name+"</div>"+
+				                            "<br>"+
+				                            "<div align=\"center\" style=\"padding-bottom: 20px\">"+
+				                              "<button type=\"button\" class=\"btn btn-success norMouse\" onclick=\"approveReview('"+data.responseJSON[i].id+"')\"> Approve <span"+
+				                                "class=\"glyphicon glyphicon-ok\"> </span></button>"+
+				                              "&nbsp;&nbsp;&nbsp;"+
+				                              "<button class=\"btn btn-danger\" onclick=\"declineReview('"+data.responseJSON[i].id+"')\"> Decline <span"+
+				                                "class=\"glyphicon glyphicon-trash\"> </span></button>"+
+				                              "&nbsp;&nbsp;&nbsp;"+
+				                            "</div>"+
+				                          "</div>"+
+				                        "</div>"+
+				                      "</div>"+
+				                    "</div>"+
+				                  "</div>"+
+				                "</div>"+
+				              "</div>"+
+				            "</div>";
+						}
+					},
+					error:function(){}
+				 });
+				
+				
+				$.ajax({
+					url:'http://localhost:8080/user/activated',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					async:false,
+					complete:function(data, textStatus){
+						var div = document.getElementById('users'); 
+						console.log(data);
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML +
+							"<div class=\"col-md-10 col-md-offset-2\" id=\"user"+data.responseJSON[i].userId+"\">" + 
+				              "<div class=\"row\">" +
+				                "<div class=\"list-group-item\">"+
+				                  "<div class=\"thumbnail\">"+
+				                    "<div class=\"row\">"+
+				                      "<div class=\"col-sm-12\">"+
+				                        "<div>"+
+				                          "<div class=\"panel panel-default\">"+
+				                            "<div class=\"panel-heading\">Name:" +data.responseJSON[i].firstName+"</div>"+
+				                            "<div class=\"panel-body\">Last name:"+ data.responseJSON[i].lastName+"</div>"+
+				                            "<div class=\"panel-footer\">Username:" +data.responseJSON[i].username+"</div>"+
+				                            "<br>"+
+				                            "<div align=\"center\" style=\"padding-bottom: 20px\">"+
+				                              "<button type=\"button\" class=\"btn btn-danger norMouse\" onclick=\"deleteUser('"+data.responseJSON[i].userId+"')\"> Delete <span"+
+				                                "class=\"glyphicon glyphicon-ok\"> </span></button>"+
+				                              "&nbsp;&nbsp;&nbsp;"+
+				                              "<button class=\"btn btn-warning\" onclick=\"blockUser('"+data.responseJSON[i].userId+"')\"> Block<span"+
+				                                "class=\"glyphicon glyphicon-trash\"> </span></button>"+
+				                              "&nbsp;&nbsp;&nbsp;"+
+				                            "</div>"+
+				                          "</div>"+
+				                        "</div>"+
+				                      "</div>"+
+				                    "</div>"+
+				                  "</div>"+
+				                "</div>"+
+				              "</div>"+
+				            "</div>";
+						}
+					},
+					error:function(){}
+				 });
+			
+			 
+			$("html").removeClass('shown');
+		}); 
+	 
+	 function declineReview(id) {
+		 $.ajax({
+				url:'http://localhost:8080/review/decline/'+id,
+				type:'get',
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				complete: function(data){
+					alert("Declined");
+					$("#review"+id).hide();
+				}
+		 });
+	 }
+
+	 
+	  function approveReview(id) {
+		 $.ajax({
+				url:'http://localhost:8080/review/approve/'+id,
+				type:'get',
+				headers: {  'Access-Control-Allow-Origin': '*' },
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+				complete: function(data){
+					alert("Approved");
+					$("#review"+id).hide();
+				}
+		 });
+	 }
+	 
+	 function decline(id) {
+		 $.ajax({
+				url:'http://localhost:8080/user/decline',
+				type:'post',
+				data:id,
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				complete: function(data){
+					$("#user"+id).hide();
+				}
+		 });
+	 }
+	 
+	 
+	 function deleteUser(id) {
+		 $.ajax({
+				url:'http://localhost:8080/user/'+id,
+				type:'delete',
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				complete: function(data){
+					alert("Deleted");
+					$("#user"+id).hide();
+				}
+		 });
+	 }
+	 
+	 function blockUser(id) {
+		  $.ajax({
+				url:'http://localhost:8080/user/block/'+id,
+				type:'get',
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				complete: function(data){
+					alert("Blocked");
+					$("#user"+id).hide();
+				}
+		 }); 
+	 }
+	 
+	 function approve(id) {
+		 console.log(id);
+		 $.ajax({
+				url:'http://localhost:8080/user/approve',
+				type:'post',
+				data:id,
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				complete: function(data){
+					$("#user"+id).hide();
+				}
+		 });
+		 
+	 }
+	 
+	 function logout() {
+			var r = confirm("Are you sure?");
+			if (r == true) {
+				$.ajax({
+					url:'http://localhost:8080/user/logout?u=admin',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					complete:function(data, textStatus){
+						if (data.status == 200) {
+							window.location.href = "/";
+						}
+					}
+				});
+			}
+		} 
+	</script>
+	
+</head>
+</head>
+<body>
+	<nav class="navbar navbar-default navbar-fixed-top">
+	    <div class="navbar-header" style="margin-left: 30px;margin-right: 30px;">
+	      <a class="navbar-brand hacked-font">Booking</a>
+	    </div>
+	    <div id="navbar" class="navbar-collapse collapse">
+	      <ul class="nav navbar-nav navbar-left">
+			<li class="admin"><a href="home.html">Home</a></li>
+	        <li class="admin"><a href="accomodation-type.html">Accomodation Types</a></li>
+	        <li class="admin"><a href="accomodation-category.html">Accomodation Categories</a></li>
+	        <li class="admin"><a href="add-agent.html">Add agent</a></li>
+	      </ul>
+	       <ul class="nav navbar-nav navbar-right">
+	        <li class="logged" style="margin-right: 30px;"><a onclick="logout()"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+	      </ul> 
+	    </div>
+	</nav>
+		
+		<div class="container-fluid" style="margin-top: 150px;">
+		  <div class="tab-content">
+		    <div class="tab-pane active" id="tab_default_1">
+		      <div class="container-fluid" style="margin-left: 28px">
+		        <ul class="nav nav-pills nav-stacked col-md-2">
+		          <li class="active"><a href="#notActivated" data-toggle="pill">Registrations</a></li>
+		          <li><a href="#reviews" data-toggle="pill">Reviews</a></li>
+		          <li ><a href="#users" data-toggle="pill">Users</a></li>
+		        </ul>
+		        <div class="tab-content col-md-6">
+		          <div class="tab-pane active" id="notActivated">
+		            <div class="row">
+		              <div class="col-lg-12 ">
+		              </div>
+		            </div>
+		            <br><br>
+		          </div>
+		          <div class="tab-pane" id="users">
+		            <div class="row">
+		              <div class="col-lg-12">
+		              </div>
+		            </div>
+		            <br><br>
+		          </div>
+		          <div class="tab-pane" id="reviews">
+		            <div class="row">
+		              <div class="col-lg-12">
+		              </div>
+		            </div>
+		            <br><br>
+		          </div>
+		        </div>
+		      </div>
+		    </div>
+		</div>
+	</div>
+	
+</body>
+</html>

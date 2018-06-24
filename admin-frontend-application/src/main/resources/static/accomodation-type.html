@@ -1,0 +1,207 @@
+<html xmlns:th="http://www.thymeleaf.org" class="js">
+
+<head>
+    <title>Booking</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <!--  ==================================== JQUERY AD BOOTSTRAP ======================================================= -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	
+	<!--  ==================================== JQUERY AD BOOTSTRAP ======================================================= -->
+	
+	<style>
+		a{
+			cursor: pointer
+		}
+		
+		html.js{
+			display: none
+		}
+	</style>
+	
+	<link rel="stylesheet" type="text/css" href="style/index.css">
+	
+	<script>
+		 $(document).ready(function() {	
+			 $.ajax({
+				 url:'http://localhost:8080/user/account?u=admin',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+						}else if(d == 404) {
+							window.location.href="/";
+						}
+					},
+					error:function(){}
+				 });
+			 
+			 $.ajax({
+					url:'http://localhost:8080/accomodation-type',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+							var div = document.getElementById('table-body'); 
+							for(var i = 0; i < data.responseJSON.length; i++) {
+								div.innerHTML = div.innerHTML + 
+								"<tr id=\"at"+data.responseJSON[i].id+"\">"+
+		                        "<td class=\"col-sm-8 col-md-6\">"+
+		                        "<div class=\"media\">"+
+		                           "<div class=\"media-body\">"+
+		                            "    <h4 class=\"media-heading\"><b>ID</b>:   "+data.responseJSON[i].id+"</h4>"+
+		                          "      <span><b>Value</b>:    "+data.responseJSON[i].type+" </span>"+
+		                         "   </div>"+
+		                       " </div></td>"+
+		                       " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
+		                       " </td>"+
+		                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong>"+
+		                       "<button class=\"btn btn-danger\" onclick=\"deleteAccomodationType('"+data.responseJSON[i].id+"')\">Delete</button>"+
+		                       "</td>"+
+		                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong></td>"+
+		                    	"</tr>";
+							}
+						}else if(d == 404) {
+						}
+					},
+					error:function(){}
+			 }); 
+			 
+			 $("#submitButton").click(function(){
+					var username = $("#username").val();
+					var as = {
+					 		type: $("#type").val(),
+					}
+					
+					$.ajax({
+						url:'http://localhost:8080/accomodation-type',
+						type:'post',
+						data: JSON.stringify(as),
+						crossDomain: true,
+				        xhrFields: {
+				            withCredentials: true
+				         },
+				         contentType:"application/json",
+				        headers: {  'Access-Control-Allow-Origin': '*' },
+						dataType:"json",
+						complete:function(data, textStatus){
+							var d = data.status;
+							if (d == 201){
+								window.location.href="/accomodation-type.html";				
+							}else if(d == 400) {
+								// bad request
+							}
+						},
+						error:function(){}
+					 }); 
+				});
+			 
+			$("html").removeClass('js');
+		}); 
+		
+		 function deleteAccomodationType(id) {
+			 $.ajax({
+				 	url:'http://localhost:8080/accomodation-type/'+id,
+					type:'delete',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					complete: function(data){
+						$("#at"+id).hide();
+					}
+			 });
+			 
+		 }
+		 
+		function logout() {
+			var r = confirm("Are you sure?");
+			if (r == true) {
+				$.ajax({
+					url:'http://localhost:8080/user/logout?u=admin',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					complete:function(data, textStatus){
+						if (data.status == 200) {
+							window.location.href = "/";
+						}
+					}
+				});
+			}
+		}
+	</script>
+</head>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<nav class="navbar navbar-default navbar-fixed-top">
+			    <div class="navbar-header" style="margin-left: 30px;margin-right: 30px;">
+			      <a class="navbar-brand hacked-font">Booking</a>
+			    </div>
+			    <div id="navbar" class="navbar-collapse collapse">
+			      <ul class="nav navbar-nav navbar-left">
+					<li class="admin"><a href="home.html">Home</a></li>
+			        <li class="admin"><a href="accomodation-type.html">Accomodation Types</a></li>
+			        <li class="admin"><a href="accomodation-category.html">Accomodation Categories</a></li>
+			        <li class="admin"><a href="add-agent.html">Add agent</a></li>
+			      </ul>
+			       <ul class="nav navbar-nav navbar-right">
+			        <li class="logged" style="margin-right: 30px;"><a onclick="logout()"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+			      </ul> 
+	    </div>
+	</nav>		</div>
+		<div class="row" style="margin-top: 60px;">
+			<form id="typeform" class="col-md-offset-3 col-md-4">
+				<div class="form-group">
+					<input type="text" name="type" id="type" class="form-control input-sm" placeholder="Accomodation Type Value">
+				</div>
+			</form>
+			<button id="submitButton" value="Add" class="btn btn-sucess btn-lg ">Save</button>
+		</div>
+		
+	    <div class="row" style="margin-top: 60px;">
+	        <div class="col-sm-12 col-md-10 col-md-offset-1"><br><br><br>
+	            <table class="table table-hover">
+	                <thead>
+	                    <tr>
+	                        <th>Accomodation Type</th>
+	                        <th></th>
+	                        <th></th>
+	                        <th></th>
+	                    </tr>
+	                </thead>
+	                <tbody id="table-body">
+	                </tbody>
+	            </table>
+	        </div>
+    </div>
+</div>
+	
+</body>
+</html>
