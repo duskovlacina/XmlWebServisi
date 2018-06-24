@@ -1,0 +1,241 @@
+<html xmlns:th="http://www.thymeleaf.org" class=shownHtml>
+
+<head>
+    <title>Booking</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	
+	
+	<style>
+		a{
+			cursor: pointer
+		}
+		
+		html.shownHtml{
+			display: none
+		}
+	</style>
+	
+	<script>
+		  $(document).ready(function() {	
+			$.ajax({
+				url:'/agent/account',
+				type:'get',
+				async:false,
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+						
+					}else  {
+						window.location.href='/';
+					}
+				},
+				error:function(){}
+			 }); 
+			 $.ajax({
+					url:'/accomodation',
+					type:'get',
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+							var div = document.getElementById('table-body'); 
+							for(var i = 0; i < data.responseJSON.length; i++) {
+								div.innerHTML = div.innerHTML + 
+								 "<tr>"+
+					             " <td>"+
+					              "  <h4>Name:</h4>"+ data.responseJSON[i].name+
+					             " </td>"+
+					             " <td>"+
+					             "   <h4>Price:</h4>"+ data.responseJSON[i].city+
+					            "  </td>"+
+					             " <td>"+
+					             "   <h4>Description:</h4>"+ data.responseJSON[i].description+
+					            "  </td>"+
+					            "  <td>"+
+					            "    <h4>Max num of persons:</h4>"+ data.responseJSON[i].capacity+
+					            "  </td>"+
+					            " <td>"+
+					             "   <a class=\"btn btn-success\" onclick=\"reserveDialog('"+data.responseJSON[i].accomodationId+"')\">Reserve</a>"+
+					            "  </td>"+
+					            "</tr>";
+							}
+						}
+					},
+					error:function(){}
+				 }); 
+			 
+			$("html").removeClass('shownHtml');
+		}); 
+		  
+	  function reserveDialog(accomodationId) {
+			document.getElementById("accomodationId").value = accomodationId;
+			 $("#reservationModalDialog").modal();
+	  }
+	  
+	  function logout() {
+			var r = confirm("Loging out?");
+			if (r == true) {
+				$.ajax({
+					url:'agent/logout',
+					type:'get',
+					complete:function(data, textStatus){
+						if (data.status == 200) {
+							window.location.href = "/";
+						}
+					}
+				});
+			}
+		}
+		
+		function validateForm() {
+			var d1 = document.getElementById('startDateForm').value;
+			var d2 = document.getElementById('endDateForm').value;
+			
+			var btn = document.getElementById('reservebutton').value;
+			
+			var startDate = new Date(d1);
+			var endDate = new Date(d2);
+			
+			if (d1 == '' || d2 == '') {
+				btn.disabled = true;
+			}else {
+				if (startDate.getTime() <= endDate.getTime()) {
+					$('#reservebutton').removeAttr('disabled');
+				}
+				
+			}
+		}
+		
+		function reserveAccomodation() {
+			var d1 = document.getElementById('startDateForm').value;
+			var d2 = document.getElementById('endDateForm').value;
+			var accId = document.getElementById("accomodationId").value;
+			
+			var reservationHelper = {
+					accomodationId: accId,
+					endDate: d2,
+					startDate: d1
+			}
+			$.ajax({
+				url : '/accomodation/reserve',
+				type : 'post',
+				dataType : "json",
+				contentType : "application/json",
+				data : JSON.stringify(reservationHelper),
+				complete : function(data, textStatus) {
+					console.log(data.responseJSON);
+					if (data.status == 200) {
+						alert("Reserved !");
+						window.location.href = "reservations.html";
+					} else {
+						alert("Accomodation not free in that period!")
+						$("#reservationModalDialog").modal('hide');
+					}
+				}
+			});
+			
+		}
+	</script>
+</head>
+</head>
+<body>
+
+
+<div class="container">
+		<div class="row">
+			<nav class="navbar navbar-default navbar-fixed-top">
+			    <div class="navbar-header" style="margin-left: 30px;margin-right: 30px;">
+			      <a href="home.html" class="navbar-brand hacked-font">Booking</a>
+			    </div>
+			    <div id="navbar" class="navbar-collapse collapse">
+			      <ul class="nav navbar-nav navbar-left">
+					<li class="admin"><a href="home.html">Home</a></li>
+					<li class="admin"><a href="accomodation-creation.html">Create Accomodation</a></li>
+					<li class="admin"><a href="messages.html">Messages</a></li>
+					<li><a href="reservations.html">Reservations</a></li>
+					<li><a href="reviews.html">Reviews</a></li>
+			      </ul>
+			      <ul class="nav navbar-nav navbar-right">
+			        <li class="logged" style="margin-right: 30px;"><a onclick="logout()"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+			      </ul>
+			    </div>
+			</nav>
+		</div>
+			  <div class="row" style="margin-top: 100px;">
+			    <div class="panel panel-info user_panel">
+			      <div class="panel-heading">
+			        <h3 class="panel-title">Accomodations</h3>
+			      </div>
+			      <div class="panel-body">
+			        <div class="table-container">
+			          <table class="table-users table" border="0">
+			            <tbody id="table-body">
+			           
+			            </tbody>
+			          </table>
+			        </div>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+    
+    <div class="modal fade" id="reservationModalDialog" role="dialog">
+    <div class="modal-dialog">
+      Modal content
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Reserve</h4>
+        </div>
+        <div class="modal-body">
+          <form style="width:500px;">
+          	<div class="row" style="width: 400px;">
+				<div class="col-md-12" style="margin-top:2%;width:400px;">
+					<div class="form-group" style="width:400px;">
+						<label style="margin-left:100px" for="accomodationId">Accomodation ID</label>
+						<input style="margin-left:100px;width:350px;" id="accomodationId"
+								 name="accomodationId" type="text" disabled="disabled"/>
+					</div>
+				</div>
+			</div>
+			<div class="row" style="margin-left:90px;width: 400px;">
+				<div class="col-md-6" style="margin-top:2%;">
+						<div class="form-group">
+						<label for="startDateForm">From </label>
+						<input id="startDateForm" onchange="validateForm()" name="startDate" type="date" placeholder="Start date" onchange="validateForm()"/>
+					</div>
+				</div>
+				
+				<div class="col-md-6" style="margin-top:2%;">
+					<div class="form-group">
+						<label for="endDateForm">To </label>
+						<input id="endDateForm" onchange="validateForm()" name="endDate" type="date" placeholder="End date" onchange="validateForm()"/>
+					</div>
+				</div>
+			</div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" id="reservebutton" disabled="true" onclick="reserveAccomodation()" 
+          data-dismiss="modal">
+          Reserve</button>
+        </div>
+      </div>
+    </div>
+  </div> 
+    
+    
+</div>
+	
+</body>
+</html>

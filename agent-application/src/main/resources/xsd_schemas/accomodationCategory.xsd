@@ -1,0 +1,26 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://com/xml_web_services/domain"
+           targetNamespace="http://com/xml_web_services/domain" 
+           elementFormDefault="qualified">
+ 	<xs:complexType name="AccomodationCategory">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="categoryName" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="GetAllAccomodationCategories">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="GetAllAccomodationCategoriesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="accomodationCategory" type="tns:AccomodationCategory" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -1,0 +1,329 @@
+<html>
+<head>
+<head>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+	integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+	crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+
+<!-- JQuery link -->
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<style>
+body {
+	background: #2c3e50;
+}
+</style>
+<head>
+<body style="background-color: grey">
+	<script>
+		$(document).ready(function() {
+			 $.ajax({
+				url:'/accomodation-category',
+				type:'get',
+				async:false,
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+						var div = document.getElementById('categories');
+						console.log('categoriessssssss');
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							console.log(data.responseJSON[i].categoryName + ' nammeeee');
+							console.log(data.responseJSON[i].id + ' nammeeee');
+							div.innerHTML = div.innerHTML + 
+							 "<option value=\""+data.responseJSON[i].categoryName+"!"+data.responseJSON[i].id+"\">"+data.responseJSON[i].categoryName+"</option>"
+							 ;
+						}
+					}else if(d == 404) {
+					}
+				},
+				error:function(){}
+		 	}); 
+			
+			$.ajax({
+				url:'/accomodation-type',
+				type:'get',
+				async:false,
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+						console.log(data);
+						var div = document.getElementById('types'); 
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML + 
+							 "<option value=\""+data.responseJSON[i].type+"!"+data.responseJSON[i].id+"\">"+data.responseJSON[i].type+"</option>"
+							;
+						}
+					}else if(d == 404) {
+					}
+				},
+				error:function(){}
+			 }); 
+			$("#submitButton").click(function() {
+				
+				var accomodationId;
+				var e = document.getElementById("cat");
+				var typeSplit = $("#types").val().split("!");
+				var categorySplit = $("#categories").val().split("!");
+				var accomodation = {
+					name : $("#name").val(),
+					country: $("#country").val(),
+					street: $("#street").val(),
+					city: $("#city").val(),
+					streetNumber: $("#streetNumber").val(),
+					breakfast: $("#breakfast:checked").val(),
+					hb: $("#hb:checked").val(),
+					fb: $("#fb:checked").val(),
+					television: $("#television:checked").val(),
+					pricePlan: {
+						price: $("#price").val(),
+						startDate: $("#startDate").val(),
+						endDate: $("#endDate").val()
+					},
+					parking: $("#parking:checked").val(),
+					wifi: $("#wifi:checked").val(),
+				
+					description: $("#description").val(),
+					capacity: $("#capacity").val(),
+					accomodationType: {
+						id: typeSplit[1],
+						type: typeSplit[0]
+					},
+					accomodationCategory: {
+						id: categorySplit[1],
+						categoryName: categorySplit[0]
+					},
+					kitchen: $("#kitchen:checked").val(),
+					bathroom: $("#bathroom:checked").val()
+				}
+				if (accomodation.parking != 'true') {
+					accomodation.parking = false;
+				}
+				if (accomodation.wifi != 'true') {
+					accomodation.wifi= false;
+				}
+				if (accomodation.breakfast != 'true') {
+					accomodation.breakfast= "false";
+				}
+				if (accomodation.hb != 'true') {
+					accomodation.hb= false;
+				}
+				if (accomodation.fb  != 'true') {
+					accomodation.fb = false;
+				}
+				if (accomodation.television  != 'true') {
+					accomodation.television = "false";
+				}
+				if (accomodation.kitchen  != 'true') {
+					accomodation.kitchen = false;
+				}
+				if (accomodation.bathroom != 'true') {
+					accomodation.bathroom = false;
+				}
+				console.log(accomodation);
+				   $.ajax({
+					url : '/accomodation',
+					type : 'post',
+					data : JSON.stringify(accomodation),
+					contentType : "application/json",
+					dataType : "json",
+					async: false,
+					complete : function(data, textStatus) {
+						var d = data.status;
+						if (d == 201) {
+							accomodationId = data.responseJSON.id;
+						} else if (d == 400) {
+							window.alert('Creation failed');
+		        	     	window.location.href='home.html';	
+						}
+					},
+					error : function() {
+					}
+				});  
+				
+				// uplaod files
+				 var files = document.getElementById("images").files;
+			    var formData = new FormData();
+			    for(var index = 0; index < files.length; index++) {
+			        formData.append("files", files[index]);
+			    }
+			    formData.append("accomodation", $("#name").val());
+			    var xhr = new XMLHttpRequest();
+			    // third paramter async = false
+			    xhr.open("POST", "/accomodation/upload-multiple-files", false);
+
+			    xhr.onload = function() {
+			        if(xhr.status == 200) {
+			        	 window.alert('Succesfully Created Accomodation');
+	        	    	 window.location.href='home.html';
+			        } else {
+			        	 window.alert('Creation failed');
+		        	     window.location.href='home.html';
+			        }
+			    }
+
+			    xhr.send(formData);  
+			}); 
+		});
+	</script>
+				<div class="row">
+					<div class="col-md-offset-4 col-md-4">
+					<h1 class="text-center">Create Accomodation</h1>
+					
+					<form id="accomodationform" >
+						<div class="form-group">
+							<input type="text" name="name" id="name"
+								class="form-control input-sm" placeholder="Accomodation name"> 
+						</div>
+						
+						<div class="form-group">
+							<label for="types">Accomodation Type</label>
+							<select name="accomodationType" id="types" class="form-control">
+							</select>
+						</div>
+						
+						<div class="form-group">
+							<label for="services">Accomodation Category</label>
+							<select name="accomodationCategory" id="categories" class="form-control">
+							</select>
+						</div>
+
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<input type="text" name="city" id="city"
+										class="form-control input-sm" placeholder="City">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<input type="text" name="country" id="country"
+										class="form-control input-sm" placeholder="Country">
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<input type="text" name="street" id="street"
+										class="form-control input-sm" placeholder="Street">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<input type="text" name="streetNumber" id="streetNumber"
+										class="form-control input-sm" placeholder="Street number">
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<input type="number" name="capacity" id="capacity"
+								class="form-control input-sm" placeholder="Maximum number of persons">
+						</div>
+						
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-group">
+									<input type="text" name="price" id="price"
+										class="form-control input-sm" placeholder="Price">
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<input type="number" name="startDate" id="startDate"
+										class="form-control input-sm" placeholder="Start year">
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<input type="number" name="endDate" id="endDate"
+										class="form-control input-sm" placeholder="End year">
+								</div>
+							</div>
+						</div>
+						
+						<div class="row" style="margin-left: 3%; margin-right:3%;">
+							<textarea class="form-control" name="description" id="description" form="accomodationform" placeholder="Description"></textarea>
+						</div>
+						<br>
+						<div class="form-group">
+							<label for="images">Images</label>
+							<input class="form-control input-sm" type="file" name="images" id="images" multiple>
+						</div>
+						
+						<div class="row">
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="parking" id="parking" value="true">Parking<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="wifi" id="wifi" value="true">Wifi<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="breakfast" id="breakfast" value="true">Breakfast<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="hb" id="hb" value="true">Half Board<br>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="fb" id="fb" value="true">Full Board<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="television" id="television" value="true">Television<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="kitchen" id="kitchen" value="true">Kitchen<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="bathroom" id="bathroom"
+										 value="true">Bathroom<br>
+								</div>
+							</div>
+						</div>
+						
+					</form>
+					 <button id="submitButton" value="Add"
+						class="btn btn-primary btn-lg btn-block">Save</button> 
+
+					<div class="modal-footer">
+						<div class="col-md-1">
+							<a href="/home.html">Home</a>
+						</div>
+					</div>
+					</div>
+				</div>
+</body>
+</html>

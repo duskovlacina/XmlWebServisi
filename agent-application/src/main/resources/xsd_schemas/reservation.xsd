@@ -1,0 +1,81 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://com/xml_web_services/domain"
+           targetNamespace="http://com/xml_web_services/domain" 
+           elementFormDefault="qualified">
+
+	<xs:include schemaLocation="accomodation.xsd" />
+	<xs:include schemaLocation="user.xsd" />
+	
+	<xs:complexType name="Reservation">
+		<xs:sequence>
+			<xs:element name="reservationId" type="xs:long" />
+			<xs:element name="capacity">
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="0" />
+						<xs:pattern value="[0-9]+" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			
+			<xs:element name="confirmed" type="xs:boolean" />
+			
+			<xs:element name="price" type="xs:float"/>
+            <xs:element name="startDate" type="xs:date"/>
+            <xs:element name="endDate" type="xs:date"/>
+			
+			<xs:element name="user" type="tns:User" />
+			<xs:element name="accomodation" type="tns:Accomodation" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="GetAgentReservations">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="agentUsername" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="GetAgentReservationsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="reservations" type="tns:Reservation" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="SendReservation">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="reservation" type="tns:Reservation"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="SendReservationResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="state" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="ReserveRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="reservation" type="tns:Reservation"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="ReserveResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="state" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    
+    
+</xs:schema>

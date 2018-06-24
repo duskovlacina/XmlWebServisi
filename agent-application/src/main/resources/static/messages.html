@@ -1,0 +1,212 @@
+<html xmlns:th="http://www.thymeleaf.org" class="js">
+
+<head>
+    <title>Booking</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	
+	
+	<style>
+		a{
+			cursor: pointer
+		}
+		
+		html.js{
+			display: none
+		}
+	</style>
+	
+	<link rel="stylesheet" type="text/css" href="style/index.css">
+	
+	<script>
+		  $(document).ready(function() {	
+			  $.ajax({
+					url:'/agent/account',
+					type:'get',
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+						}else {
+							window.location.href='/';
+						}
+					},
+					error:function(){}
+				 }); 
+			 
+			 $.ajax({
+					url:'/message',
+					type:'get',
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+							var div = document.getElementById('table-body'); 
+							for(var i = 0; i < data.responseJSON.length; i++) {
+								div.innerHTML = div.innerHTML + 
+								 "<tr id=\"msg"+data.responseJSON[i].serverId+"\">"+
+		                        "<td class=\"col-sm-8 col-md-6\">"+
+		                       " <div class=\"media\">"+
+		                           " <div class=\"media-body\">"+
+		                             "  <h4 class=\"media-heading\"> <strong>Message </strong>: "+data.responseJSON[i].msgContent+"</h4>"+
+		                            "</div>"+
+		                        "</div></td>"+
+		                       " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
+		                       " </td>"+
+		                       " <td class=\"col-sm-1 col-md-1 text-center\"><button onclick=\"reply('"+data.responseJSON[i].serverId+"')\" class=\"btn btn-primary\">Reply</button></td>"+
+		                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong></td>"+
+		                       " <td class=\"col-sm-1 col-md-1\">"+
+		                       " </td>"+
+		                    "</tr>";
+							}
+						}else if(d == 404) {
+						}
+					},
+					error:function(){}
+				 }); 
+			 
+			$("html").removeClass('js');
+		}); 
+		  
+		function reply(messageId) {
+			document.getElementById("messageId").value = messageId;
+			 $("#replyModal").modal();
+		}
+		
+		function sendReply(){
+			 var msgServerId = document.getElementById("messageId").value;
+			 var msgContent = document.getElementById("replyMsg").value;
+			 var reply = {
+				 msgId: msgServerId,
+				 replyContent: msgContent
+			 }
+			 $.ajax({
+					url:'/reply',
+					type:'post',
+					data: JSON.stringify(reply),
+					contentType:"application/json",
+					dataType:"json",
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+							console.log('hideeeee msg' + msgServerId)
+							$("#replyModal").modal('hide');	
+							$("#msg"+msgServerId).hide();
+						}else if(d == 400) {
+							// bad request
+						}
+					},
+					error:function(){}
+				 }); 
+		}
+		
+		function logout() {
+			var r = confirm("Are you sure?");
+			if (r == true) {
+				$.ajax({
+					url:'/agent/logout',
+					type:'get',
+					complete:function(data, textStatus){
+						if (data.status == 200) {
+							window.location.href = "/";
+						}
+					}
+				});
+			}
+			
+		}
+	</script>
+</head>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<nav class="navbar navbar-default navbar-fixed-top">
+			    <div class="navbar-header" style="margin-left: 30px;margin-right: 30px;">
+			      <a href="home.html" class="navbar-brand hacked-font">Booking</a>
+			    </div>
+			    <div id="navbar" class="navbar-collapse collapse">
+			      <ul class="nav navbar-nav navbar-left">
+					<li class="admin"><a href="home.html">Home</a></li>
+					<li class="admin"><a href="accomodation-creation.html">Create Accomodation</a></li>
+					<li class="admin"><a href="messages.html">Messages</a></li>
+					<li><a href="reservations.html">Reservations</a></li>
+					<li><a href="reviews.html">Reviews</a></li>
+			      </ul>
+			      <ul class="nav navbar-nav navbar-right">
+			        <li class="logged" style="margin-right: 30px;"><a onclick="logout()"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+			      </ul>
+			    </div>
+			</nav>
+		</div>
+	    <div class="row" style="margin-top: 60px;">
+	        <div class="col-sm-12 col-md-10 col-md-offset-1">
+	            <table class="table table-hover">
+	                <thead>
+	                    <tr>
+	                        <th><h2>Messages</h2></th>
+	                        <th></th>
+	                        <th class="text-center"></th>
+	                        <th class="text-center"></th>
+	                        <th> </th>
+	                    </tr>
+	                </thead>
+	                <tbody id="table-body">
+	                </tbody>
+	            </table>
+	        </div>
+    	</div>
+    	
+    	
+    	 <div class="modal fade" id="replyModal" role="dialog">
+		    <div class="modal-dialog">
+		      <!-- Modal content-->
+		      <div class="modal-content">
+		        <div class="modal-header">
+		          <button type="button" class="close" data-dismiss="modal">&times;</button>
+		          <h4 class="modal-title">Send message</h4>
+		        </div>
+		        <div class="modal-body">
+		          <form style="width:500px;">
+		          	<div class="row" style="width: 400px;">
+						<div class="col-md-12" style="margin-top:2%;width:400px;">
+							<div class="form-group" style="width:400px;">
+								<label style="margin-left:100px" for="messageId">Message ID</label>
+								<input style="margin-left:100px;width:350px;" id="messageId"
+										 name="message" type="text" disabled="disabled"/>
+							</div>
+						</div>
+					</div>
+		          	<div class="row" style="width: 400px;">
+						<div class="col-md-12" style="margin-top:2%;width:400px;">
+							<div class="form-group" style="width:400px;">
+								<input style="margin-left:100px;width:350px;height: 50px;" id="replyMsg" name="replyMsg" 
+									type="text" placeholder="Reply message"/>
+							</div>
+						</div>
+					</div>
+		          </form>
+		        </div>
+		        <div class="modal-footer">
+		          <button type="button" class="btn btn-primary" onclick="sendReply()"> 
+		          <!-- data-dismiss="modal" -->
+		          Save</button>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+    	
+    	
+</div>
+	
+</body>
+</html>
