@@ -1,0 +1,16 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://com/xml_web_services/domain"
+           targetNamespace="http://com/xml_web_services/domain" 
+           elementFormDefault="qualified">
+	<xs:complexType name="User">
+        <xs:sequence>
+            <xs:element name="userId" type="xs:long"/>
+            <xs:element name="username" type="xs:string"/>
+            <xs:element name="password" type="xs:string"/>
+            <xs:element name="firstName" type="xs:string"/>
+            <xs:element name="lastName" type="xs:string"/>
+            
+            <xs:element name="userStatus" type="xs:string"/>
+            <xs:element name="userType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

@@ -1,0 +1,82 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://com/xml_web_services/domain"
+           targetNamespace="http://com/xml_web_services/domain" 
+           elementFormDefault="qualified">
+	
+	<xs:include schemaLocation="accomodationType.xsd" />
+	<xs:include schemaLocation="accomodationCategory.xsd" />
+	<xs:include schemaLocation="agent.xsd" />
+	
+	<xs:complexType name="PricePlan">
+		<xs:sequence>
+			<xs:element name="id" type="xs:long" />
+			<xs:element name="price" type="xs:float" />
+			<xs:element name="startDate" type="xs:int" />
+			<xs:element name="endDate" type="xs:int" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Images">
+		<xs:sequence>
+			<xs:element name="id" type="xs:long" />
+			<xs:element name="url" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="Accomodation">
+		<xs:sequence>
+		 	<xs:element name="accomodationId" type="xs:long" />
+			<xs:element name="name" type="xs:string" />
+			<xs:element name="description" type="xs:string" nillable="false" />
+			<xs:element name="capacity">
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="0" />
+						<xs:pattern value="[0-9]+" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			
+			<xs:element name="accomodationType" type="tns:AccomodationType" />
+			<xs:element name="accomodationCategory" type="tns:AccomodationCategory" />
+			<xs:element name="agent" type="tns:Agent" /> 
+			<xs:element name="images" type="tns:Images" minOccurs="0" maxOccurs="unbounded"/>
+			
+			<xs:element name="pricePlan" type="tns:PricePlan"></xs:element>
+			
+			<xs:element name="street" type="xs:string" />
+			<xs:element name="city" type="xs:string" />
+			<xs:element name="country" type="xs:string" />
+			<xs:element name="streetNumber" type="xs:string" />
+
+			<xs:element name="parking" type="xs:boolean"/>
+			<xs:element name="wifi" type="xs:boolean"/>
+			<xs:element name="breakfast" type="xs:boolean"/>
+			<xs:element name="hb" type="xs:boolean"/>
+			<xs:element name="fb" type="xs:boolean"/>
+		
+			<xs:element name="television" type="xs:boolean"/>
+			<xs:element name="kitchen" type="xs:boolean"/>
+			<xs:element name="bathroom" type="xs:boolean"/>
+			<xs:element name="grade" type="xs:float"/>
+			
+		</xs:sequence>
+	</xs:complexType>
+	
+	
+	<xs:element name="SendAccomodation">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="accomodation" type="tns:Accomodation"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="SendAccomodationResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="status" type="xs:boolean" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+	
+</xs:schema>
