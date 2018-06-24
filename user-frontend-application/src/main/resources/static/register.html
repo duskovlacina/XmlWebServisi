@@ -1,0 +1,146 @@
+<html>
+<head>
+
+<head>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>	
+	
+	<!-- JQuery link -->
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	
+	<style>
+	body{
+		background: #2c3e50;
+	}
+	
+	</style>
+
+<head>
+<body>
+	<script>
+		$(document).ready(function(){
+			$("#submitButton").click(function(){
+				var user = {
+						username: $("#username").val(),
+						password: $("#password1").val(),
+						email: $("#email").val(),
+						firstName: $("#name").val(),
+						lastName: $("#surname").val(),
+				}
+				
+				$.ajax({
+					url:'http://localhost:8090/user/register',
+					type:'post',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					data: JSON.stringify(user),
+					contentType:"application/json",
+					dataType:"json",
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 201){
+							window.location.href="/";				
+						}else if(d == 400) {
+						}
+					},
+					error:function(){}
+				 });
+			});
+		});
+	
+	</script>
+
+        <div class="modal show">
+			<div class="modal-dialog">
+				<div  class="modal-content">
+					<div class="modal-header">
+						<h1 class="text-center">Registration</h1>
+					</div>
+					<div class="modal-body">
+						<form id="registerform">
+							
+							<div class="form-group">
+								<input type="text" name="username" id="username" class="form-control input-sm" placeholder="Username">
+								<span id="rusernamespan" style="display:none;color:red;"></span>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<input type="password" name="password1" id="password1" class="form-control input-sm" placeholder="Password">
+										 <span id="rpassword1span" style="display:none;color:red;"></span>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<input type="password" name="password2" id="password2" class="form-control input-sm" placeholder="Confirm Password">
+										<span id="rpassword2span" style="display:none;color:red;"></span>
+									</div>
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<input type="email" name="email" id="email" class="form-control input-sm" placeholder="Email Address">
+								<span id="remailspan" style="display:none;color:red;"></span>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<input type="text" name="name" id="name" class="form-control input-sm" placeholder="First Name">
+										 <span id="rnamespan" style="display:none;color:red;"></span>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<input type="text" name="surname" id="surname" class="form-control input-sm" placeholder="Last Name">
+										<span id="rsurnamespan" style="display:none;color:red;"></span>
+									</div>
+								</div>
+							</div>
+							
+							<!-- <div class="form-group">
+								<input type="text" name="phone" id="phone" class="form-control input-sm" placeholder="Phone">
+								<span id="rphonespan" style="display:none;color:red;"></span>
+							</div>
+							
+							
+							<div class="form-group">
+								<input type="text" name="address" id="address" class="form-control input-sm" placeholder="Address">
+								<span id="raddressspan" style="display:none;color:red;"></span>
+							</div>
+
+							<div class="form-group">
+								<input type="text" name="state" id="state" class="form-control input-sm" placeholder="State">
+								<span id="rstatespan" style="display:none;color:red;">
+							</div>
+
+							 -->
+							
+						</form>
+						<button id="submitButton" value="Register" class="btn btn-primary btn-lg btn-block">Register</button>
+					</div>
+					
+					<div class="modal-footer">
+						<div class="col-md-1">
+							<a href="/">Home</a>	
+						</div>
+						<div class="col-md-offset-9 col-md-1">
+							<a href="login.html">Login</a>
+						</div>	
+					</div>
+	    		</div>
+    		</div>
+    	</div>
+</body>
+</html>

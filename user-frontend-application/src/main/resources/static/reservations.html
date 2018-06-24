@@ -1,0 +1,361 @@
+<html xmlns:th="http://www.thymeleaf.org" class="htmlShown">
+
+<head>
+    <title>Booking</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	
+	
+	<style>
+		a{
+			cursor: pointer
+		}
+		
+		html.htmlShown{
+			display: none
+		}
+	</style>
+	
+	<script>
+		 $(document).ready(function() {	
+			 
+			 $.ajax({
+				 url:'http://localhost:8080/user/account?u=user',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+							var d = JSON.parse(data.responseText);
+							$(".logged").show();
+							$(".notlogged").hide();
+							if(d.userType == "USER") {
+								$(".user").show();
+								$(".admin").hide();
+							}
+						}else if(d == 404) {
+							window.location.href="/";s
+						}
+					},
+			 });
+			 
+			 $.ajax({
+					url:'http://localhost:8080/reservation/user',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+							var div = document.getElementById('table-body'); 
+							for(var i = 0; i < data.responseJSON.length; i++) {
+								var startDate = new Date(data.responseJSON[i].startDate);
+								var endDate = new Date(data.responseJSON[i].endDate);
+								
+								var currentDate = new Date();
+								var showSendMessage = 'none';
+								var showLeaveReview = 'none';
+								
+								if (currentDate.getTime() < endDate.getTime()) {
+									showSendMessage = 'flex';
+								}
+								if (currentDate.getTime() > endDate.getTime()) {
+									showLeaveReview = 'flex';
+								}
+								
+								div.innerHTML = div.innerHTML + 
+								 "<tr id=\"reservation"+data.responseJSON[i].reservationId + "\">"+
+					             " <td>"+
+					              "  <h4>Full price of reservation:</h4>"+ data.responseJSON[i].price+
+					             " </td>"+
+					             " <td>"+
+					             "   <h4>Start date:</h4>"+ startDate.toLocaleDateString("en-US")+
+					            "  </td>"+
+					            "  <td>"+
+					            "    <h4>End date:</h4>"+ endDate.toLocaleDateString("en-US")+
+					            "  </td>"+
+					            "  <td>"+
+					            "    <h4>Accomodation:</h4>"+ data.responseJSON[i].accomodation.name+
+					            "  </td>"+
+					            "<td>"+
+					            "  <button class=\"btn btn-primary\" style=\"display:"+showSendMessage+"\" onclick=\"sendMessageDialog('"+data.responseJSON[i].accomodation.accomodationId+"')\" >Send message</button> "+
+	                             "  <button class=\"btn btn-primary\" style=\"display:"+showLeaveReview+"\" onclick=\"commentReservation('"+data.responseJSON[i].accomodation.accomodationId+"')\" >Leave review</button>"+
+	                             "   <br>" +
+	                             "  <button class=\"btn btn-danger\" style=\"display:"+showSendMessage+"\" onclick=\"cancelReservation('"+data.responseJSON[i].reservationId+"')\" >Cancel reservation</button>"+
+					            "</td>"+
+				            		"</tr>";
+				            		
+							}
+						}else if(d == 404) {
+						}
+					},
+					error:function(){}
+				 }); 
+			 
+			 $("html").removeClass('htmlShown');
+		 });
+		 
+		 function sendMessageDialog(accomodationId) {
+			 document.getElementById("accomodationId").value = accomodationId;
+			 $("#sendMessageModalWindow").modal();
+		 }
+		 
+		 function sendMessage() {
+			 var accId = document.getElementById("accomodationId").value;
+			 var msgContent = document.getElementById("message").value;
+			 var message = {
+				 accomodationId: accId,
+				 content: msgContent
+			 }
+			 $.ajax({
+					url:'http://localhost:8080/message',
+					type:'post',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					data: JSON.stringify(message),
+					contentType:"application/json",
+					dataType:"json",
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+							$("#sendMessageModalWindow").modal('hide');
+						}else if(d == 400) {
+							// bad request
+						}
+					},
+					error:function(){}
+				 }); 
+		 }
+		 
+		
+		 
+		 function leaveReviewBtn() {
+				var rate = document.getElementById('rateInput').value;
+				var commentTxt = document.getElementById('commentTxt').value;
+				var review = {
+					reviewText: commentTxt,
+					grade: rate
+				}
+				$.ajax({
+					url:'http://localhost:8080/accomodation/'+document.getElementById("accomodationId").value + '/review',
+					type:'post',
+					headers: {  'Access-Control-Allow-Origin': '*' },
+					contentType:"application/json",
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			     	data: JSON.stringify(review),
+					dataType:"json",
+					complete:function(data, textStatus){
+						var d = data.status;
+						alert("Waiting for approwal.")
+						$("#commentModal").modal('hide');
+					},
+					error:function(){}
+				});
+				
+			}
+			
+			 function commentReservation(accomodationId) {
+				 document.getElementById("accomodationId").value = accomodationId;
+				 $("#commentModal").modal();
+			}
+		 
+			function checkForm() {
+				var d2 = document.getElementById('commentTxt').value;
+				var d1 = document.getElementById('rateInput').value;
+				var button = document.getElementById('leaveReviewButton').value;
+				if (d1 == '' || d2 == '') {
+					button.disabled = true;
+				}else {
+					$('#leaveReviewButton').removeAttr('disabled');
+					
+				}
+			}
+			
+		 function logout() {
+				var r = confirm("Loging out?");
+				if (r == true) {
+					$.ajax({
+						url:'http://localhost:8080/user/logout?u=user',
+						type:'get',
+						crossDomain: true,
+				        xhrFields: {
+				            withCredentials: true
+				         },
+				        headers: {  'Access-Control-Allow-Origin': '*' },
+						complete:function(data, textStatus){
+							if (data.status == 200) {
+								window.location.href = "/";
+							}
+						}
+					});
+				}
+			}
+		 
+		 function cancelReservation(reservationId) {
+			 var r = confirm("Are you sure?");
+			 if (r == true) {
+				 $.ajax({
+						url:'http://localhost:8080/reservation/'+reservationId,
+						type:'delete',
+						crossDomain: true,
+				        xhrFields: {
+				            withCredentials: true
+				         },
+				        headers: {  'Access-Control-Allow-Origin': '*' },
+						complete: function(data){
+							if (data.status == 200) {
+							$("#reservation"+reservationId).hide();
+							}else {
+								alert("Failed!")
+							}
+						}
+				 });
+			}
+		 }
+	</script>
+</head>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<nav class="navbar navbar-default navbar-fixed-top">
+			    <div class="navbar-header" style="margin-left: 30px;margin-right: 30px;">
+			      <a class="navbar-brand hacked-font">Booking</a>
+			    </div>
+			    <div id="navbar" class="navbar-collapse collapse">
+			      <ul class="nav navbar-nav navbar-left">
+			        <li ><a href="/">Hotels</a></li>
+			        <li class="user"><a href="reservations.html">Reservations</a></li>
+			        <li class="user"><a href="messaging-history.html">Chat history</a></li>
+			      </ul>
+			      <ul class="nav navbar-nav navbar-right">
+			      	<li class="notlogged" style="margin-right: 30px;"><a href="login.html"><span class="glyphicon glyphicon-user"></span> Login</a></li>
+			      	<li class="notlogged" style="margin-right: 30px;"><a href="register.html"><span class="glyphicon glyphicon-user"></span> Register</a></li>
+			        <li class="logged" style="margin-right: 30px;"><a onclick="logout()"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+			      </ul>
+			    </div>
+			</nav>
+		</div>
+	    <div class="row" style="margin-top: 60px;">
+	        <div class="col-sm-12 col-md-10 col-md-offset-1">
+	        
+	        	<br><hr>
+	            <table class="table table-hover" id="table-content">
+	                <thead>
+	                    <tr>
+	                        <th><h2>Reservations</h2></th>
+	                        <th></th>
+	                        <th class="text-center"></th>
+	                        <th class="text-center"></th>
+	                        <th> </th>
+	                    </tr>
+	                </thead>
+	                <tbody id="table-body">
+	                </tbody>
+	            </table>
+	        </div>
+    </div>
+    
+    
+   <div class="modal fade" id="sendMessageModalWindow" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Send message</h4>
+        </div>
+        <div class="modal-body">
+          <form style="width:500px;">
+          	<div class="row" style="width: 400px;">
+				<div class="col-md-12" style="margin-top:2%;width:400px;">
+					<div class="form-group" style="width:400px;">
+						<label style="margin-left:100px" for="accomodationId">Accomodation ID</label>
+						<input style="margin-left:100px;width:350px;" id="accomodationId"
+								 name="accomodationId" type="text" disabled="disabled"/>
+					</div>
+				</div>
+			</div>
+          	<div class="row" style="width: 400px;">
+				<div class="col-md-12" style="margin-top:2%;width:400px;">
+					<div class="form-group" style="width:400px;">
+						<input style="margin-left:100px;width:350px;height: 50px;" id="message" name="message" type="text" placeholder="Message"/>
+					</div>
+				</div>
+			</div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="sendMessage()"> 
+          <!-- data-dismiss="modal" -->
+          Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="commentModal" role="dialog">
+		    <div class="modal-dialog">
+		      <!-- Modal content-->
+		      <div class="modal-content">
+		        <div class="modal-header">
+		          <button type="button" class="close" data-dismiss="modal">&times;</button>
+		          <h4 class="modal-title">Comment</h4>
+		        </div>
+		        <div class="modal-body">
+		          <form style="width:500px;">
+		          	<div class="row" >
+						<div class="col-md-10" >
+							<div class="form-group" >
+								<input  id="commentTxt" name="commentTxt" style="width:350px;" 
+									type="text" placeholder="Comment" onchange="checkForm()"/>
+							</div>
+						</div>
+						<div class="col-md-2" ">
+							<div class="form-group"">
+								<input id="rateInput" style="width:100px;" name="rateInput" 
+									type="number" placeholder="Rate" onchange="checkForm()"/>
+							</div>
+						</div>
+					</div>
+		          </form>
+		        </div>
+		        <div class="modal-footer">
+		          <button type="button" id="leaveReviewButton" class="btn btn-primary" disabled="true" onclick="leaveReviewBtn()"> 
+		          Save</button>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+  
+  
+</div>
+	
+</body>
+</html>

@@ -1,0 +1,492 @@
+<html xmlns:th="http://www.thymeleaf.org" class="htmlShown">
+
+<head>
+    <title>Booking</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	
+	<style>
+		a{
+			cursor: pointer
+		}
+		
+		html.htmlShown{
+			display: none
+		}
+	</style>
+	
+	
+	<script>
+		 $(document).ready(function() {	
+			 
+			 
+			 $.ajax({
+				 url:'http://localhost:8080/user/account?u=user',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						$(".sort").hide();
+						if (d == 200){
+							var d = JSON.parse(data.responseText);
+							$(".logged").show();
+							$(".notlogged").hide();
+							
+							if(d.userType == "USER") {
+								$(".user").show();
+								$(".admin").hide();
+							}
+						}else if(d == 404) {
+							$(".notlogged").show(100);
+							$(".logged").hide(100);
+							$(".user").hide(100);
+							$(".admin").hide(100);
+						}
+					},
+					error:function(){}
+				 });
+			 
+			 
+			 $.ajax({
+				url:'http://localhost:8080/accomodation-type',
+				type:'get',
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				async:false,
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+						var div = document.getElementById('types'); 
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML + 
+							 "<option value=\""+data.responseJSON[i].type+"\">"+data.responseJSON[i].type+"</option>"
+							;
+						}
+					}else if(d == 404) {
+					}
+				},
+				error:function(){}
+			 }); 
+			
+			$.ajax({
+				url:'http://localhost:8080/accomodation-category',
+				type:'get',
+				async:false,
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+						var div = document.getElementById('category'); 
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML + 
+							 "<option value=\""+data.responseJSON[i].categoryName+"\">"+data.responseJSON[i].categoryName+"</option>"
+							;
+						}
+					}else if(d == 404) {
+					}
+				},
+				error:function(){}
+			 }); 
+			
+			
+			$.ajax({
+				url:'http://localhost:8080/accomodation',
+				type:'get',
+				async:false,
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+						var div = document.getElementById('table-body'); 
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML + 
+							 "<tr>"+
+				             " <td>"+
+				              "  <h4>Name:</h4>"+ data.responseJSON[i].name+
+				             " </td>"+
+				             " <td>"+
+				             "   <h4>Price:</h4>"+ data.responseJSON[i].city+
+				            "  </td>"+
+				            "  <td>"+
+				            "    <h4>Max num of persons:</h4>"+ data.responseJSON[i].capacity+
+				            "  </td>"+
+				            "  <td>"+
+				            "    <h4>Description:</h4>"+ data.responseJSON[i].description+
+				            "  </td>"+
+				            " <td>"+
+				            " <a class=\"btn btn-success\" href=\"accomodation-details.html?id="+data.responseJSON[i].id+"\">Accomodation details</a>"
+				            "  </td>"+
+			            		"</tr>";
+						}
+					}else if(d == 404) {
+					}
+				},
+				error:function(){}
+			 }); 
+
+			
+			
+			$("html").removeClass('htmlShown');
+		}); 
+		
+		function search() {
+			var accomodationSearch = {
+				country: $("#country").val(),
+				startDate: $("#startDate").val(),
+				endDate: $("#endDate").val(),
+				capacity: $("#capacity").val(),
+				endDate: $("#endDate").val(),
+				parking: $("#parking:checked").val(),
+				wifi: $("#wifi:checked").val(),
+				breakfast: $("#breakfast:checked").val(),
+				hb: $("#hb:checked").val(),
+				fb: $("#fb:checked").val(),
+				television: $("#television:checked").val(),
+				kitchen: $("#kitchen:checked").val(),
+				bathroom: $("#bathroom:checked").val(),
+				accomodationTypeValue: $("#types").val(),
+				accomodationCategoryValue : $("#category").val()
+			}
+			
+			var startDate =  $("#startDate").val();
+			var endDate =  $("#endDate").val()
+			var capacity = $("#capacity").val();
+			var userLogged = false;
+			// check if user is logged in
+			$.ajax({
+				 url:'http://localhost:8080/user/account?u=user',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					async:false,
+					complete:function(data, textStatus){
+						var d = data.status;
+						if (d == 200){
+							userLogged = true;
+						}
+					},
+					error:function(){}
+				 });
+			
+			
+			$.ajax({
+				url : 'http://localhost:8080/accomodation/search',
+				type : 'post',
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				data : JSON.stringify(accomodationSearch),
+				contentType : "application/json",
+				dataType : "json",
+				complete : function(data, textStatus) {
+					var d = data.status;
+					if (d == 200) {
+						var div = document.getElementById('table-body');
+						console.log(data.responseJSON);
+						console.log("SEARCHEDDD !!!!");
+						while(div.hasChildNodes())
+						{
+							div.removeChild(div.firstChild);
+						}
+						 for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML + 
+							 "<tr>"+
+	                        "<td class=\"col-sm-8 col-md-6\">"+
+	                       " <div class=\"media\">"+
+	                           " <div class=\"media-body\">"+
+	                             "  <h4 class=\"media-heading\"> <strong>Accomodation name</strong>: "+data.responseJSON[i].name+"</h4>"+
+	                             "  <h5 class=\"media-heading\">  <strong>Type</strong> : " + data.responseJSON[i].accomodationType.value+"</h5>"+ 
+	                             "  <h5 class=\"media-heading\">  <strong>Country</strong>: " + data.responseJSON[i].country +"</h5>"+
+	                              "  <h5 class=\"media-heading\">  <strong>City</strong>: " + data.responseJSON[i].city+"</h5>"+
+	                              
+	                              "  <h5 class=\"media-heading\">  <strong>Address</strong>: " + data.responseJSON[i].street+ " " + data.responseJSON[i].streetNumber +"</h5>"+
+	                              
+	                              "  <h5 class=\"media-heading\">  <strong>Category</strong> : " + data.responseJSON[i].accomodationCategory.value+"</h5>"+
+	                              "  <h5 class=\"media-heading\">  <strong>Description</strong>: " + data.responseJSON[i].description+"</h5>"+
+	                              "  <h4 class=\"media-heading\">  <strong>Price per night</strong> : " + data.responseJSON[i].pricePlan.price+"</h5>"+
+	                            "</div>"+
+	                        "</div></td>"+
+	                       " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
+	                       " </td>"+
+	                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong></td>"+
+	                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong></td>";
+	                       if (userLogged) {
+	                    	   div.innerHTML = div.innerHTML + 
+		                       " <td class=\"col-sm-1 col-md-1\" class=\"logged\">"+
+		                       " <button  style=\"display:hidden;\"  type=\"button\" class=\"btn btn-success logged user reservation-button\" onclick=\"reserve('"+data.responseJSON[i].accomodationId+ "','"+startDate+"','"+endDate+"','"+capacity+"')\">"+
+		                       "     <span class=\"glyphicon glyphicon-ok\"></span> Reserve"+
+		                       " </button></td>";
+	                       }
+	                       div.innerHTML = div.innerHTML + "</tr>";
+						} 
+						 $(".sort").show();
+					} else if (d == 400) {
+					}
+				},
+				error : function() {
+				}
+			 });
+		}
+		
+		function reserve(accId, startingDate, endingDate, numberOfPersons) {
+			
+			var reservationHelper = {
+				accomodationId: accId,
+				startDate: startingDate,
+				endDate: endingDate,
+				numOfPersons: numberOfPersons
+			}
+			console.log(reservationHelper);
+			$.ajax({
+				url : 'http://localhost:8080/accomodation/reserve',
+				type : 'post',
+				headers: {  'Access-Control-Allow-Origin': '*' },
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		         contentType : "application/json",
+		         crossDomain: true,
+		         dataType : "json",
+				data : JSON.stringify(reservationHelper),
+				complete : function(data, textStatus) {
+					console.log(data.responseJSON);
+					if (data.status == 200) {
+						alert("Reservation created !");
+						window.location.href = "reservations.html";
+					}
+				}
+			});
+		}
+		
+
+		function check() {
+			var d3 = document.getElementById('capacity').value;
+			var d4 = document.getElementById('country').value;
+			var d1 = document.getElementById('startDate').value;
+			var d2 = document.getElementById('endDate').value;
+		
+			
+			var btn = document.getElementById('searchbutton').value;
+			
+			var startDate = new Date(d1);
+			var endDate = new Date(d2);
+			
+			if (d1 == '' || d2 == '' || d3 == '' || d4 == '') {
+				btn.disabled = true;
+			}else {
+				if (startDate.getTime() <= endDate.getTime()) {
+					$('#searchbutton').removeAttr('disabled');
+				}
+				
+			}
+		} 
+		
+		
+		function logout() {
+			var r = confirm("Loging out?");
+			if (r == true) {
+				$.ajax({
+					url:'http://localhost:8080/user/logout?u=user',
+					type:'get',
+					crossDomain: true,
+			        xhrFields: {
+			            withCredentials: true
+			         },
+			        headers: {  'Access-Control-Allow-Origin': '*' },
+					complete:function(data, textStatus){
+						if (data.status == 200) {
+							window.location.href = "/";
+						}
+					}
+				});
+			}
+		}
+	</script>
+</head>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<nav class="navbar navbar-default navbar-fixed-top">
+			    <div class="navbar-header" style="margin-left: 30px;margin-right: 30px;">
+			      <a class="navbar-brand hacked-font">Booking</a>
+			    </div>
+			    <div id="navbar" class="navbar-collapse collapse">
+			      <ul class="nav navbar-nav navbar-left">
+			        <li ><a href="/">Hotels</a></li>
+			        <li class="user"><a href="reservations.html">Reservations</a></li>
+			        <li class="user"><a href="messaging-history.html">Chat history</a></li>
+			      </ul>
+			      <ul class="nav navbar-nav navbar-right">
+			      	<li class="notlogged" style="margin-right: 30px;"><a href="login.html"><span class="glyphicon glyphicon-user"></span> Login</a></li>
+			      	<li class="notlogged" style="margin-right: 30px;"><a href="register.html"><span class="glyphicon glyphicon-user"></span> Register</a></li>
+			        <li class="logged" style="margin-right: 30px;"><a onclick="logout()"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+			      </ul>
+			    </div>
+			</nav>
+		</div>
+	    <div class="row" style="margin-top: 60px;">
+	        <div class="col-lg-12">
+	        <div class="row">
+	        	<div class="col-md-5">
+	        		<h2>Search</h2>
+	        		<hr>
+	        		<form id="searchForm">
+						<h3>Mandatory</h3>
+						<hr>
+						<div class="row">
+							<div class="col-md-6" style="margin-top:2%;">
+								<div class="form-group">
+									<label for="startDate">From </label>
+									<input id="startDate" name="startDate" type="date" placeholder="Start date" onchange="check()"/>
+								</div>
+							</div>
+							
+							<div class="col-md-6" style="margin-top:2%;">
+								<div class="form-group">
+									<label for="endDate">To </label>
+									<input id="endDate" name="endDate" type="date" placeholder="End date" onchange="check()"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12">
+								<div class="form-group">
+									<label for="capacity">Capacity </label>
+									<input type="number" name="capacity" id="capacity" 
+											class="form-control input-sm" min="0" placeholder="Number of persons" onchange="check()">
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="form-group">
+									<label for="country">Country </label>
+									<input type="text" name="country" id="country" 
+											class="form-control input-sm" min="0" placeholder="Country" onchange="check()">
+								</div>
+							</div>
+				
+						<h3>Not mandatory</h3>						
+						<hr>
+						
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="types">Accomodation Category</label>
+									<select name="accomodationCategory" id="category" class="form-control">
+									</select>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="types">Accomodation Type</label>
+									<select name="accomodationType" id="types" class="form-control">
+									</select>
+								</div>
+							</div>
+						
+						</div>
+						
+						<div class="row">
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="parking" id="parking" value="true">Parking<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="wifi" id="wifi" value="true">Wifi<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="breakfast" id="breakfast" value="true">Breakfast<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="hb" id="hb" value="true">Half Board<br>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="fb" id="fb" value="true">Full Board<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="television" id="television" value="true">Tv<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="kitchen" id="kitchen" value="true">Kitchen<br>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<input type="checkbox" name="bathroom" id="bathroom"
+										 value="true">Private Bathroom<br>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="row">
+						<div class="col-md-1">
+							<button id="searchbutton" value="Add"
+								class="btn btn-success btn-lg" onclick="search()" disabled="true">Search</button>
+						</div>
+					</div>
+	        	</div>
+	        	<br><hr>
+	        	<div class="col-md-7">
+	            <table class="table table-hover" id="table-content">
+	                <thead>
+	                    <tr>
+	                        <th>Accomodations</th>
+	                        <th></th>
+	                        <th class="text-center"></th>
+	                        <th class="text-center"></th>
+	                        <th><div class="dropdown">
+							  <!-- <button onclick="myFunction()" class="dropbtn btn btn-info  sort">Sort by </button>
+							  <div id="myDropdown" class="dropdown-content">
+							    <a onclick="sort('price')">Price</a>
+							    <a onclick="sort('raiting')">Raiting</a>
+							    <a onclick="sort('category')">Category</a>
+							  </div>
+							</div>--> </th>
+	                    </tr>
+	                </thead>
+	                <tbody id="table-body">
+	                </tbody>
+	            </table>
+	            </div>
+	            </div>
+	            </div>
+	        </div>
+    </div>
+</div>
+	
+</body>
+</html>

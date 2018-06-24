@@ -1,0 +1,263 @@
+<html class="js">
+<head>
+    <title>Booking</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <!--  ==================================== JQUERY AD BOOTSTRAP ======================================================= -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	
+	<!--  ==================================== JQUERY AD BOOTSTRAP ======================================================= -->
+	
+<style>
+</style>
+<script>
+	$(document).ready(function() {	
+		
+		$.ajax({
+			url:'http://localhost:8080/user/account?u=user',
+			type:'get',
+			crossDomain: true,
+	        xhrFields: {
+	            withCredentials: true
+	         },
+	        headers: {  'Access-Control-Allow-Origin': '*' },
+			async:false,
+			complete:function(data, textStatus){
+				var d = data.status;
+				if (d == 200){
+					}
+				}else if(d == 404) {
+					window.location.href="/";s
+				}
+			},
+		});
+		
+		
+		var imgDiv = document.getElementById('imgDiv'); 
+		
+		
+		$.ajax({
+			url:'http://localhost:8080/accomodation/'+findGetParameter("id"),
+			type:'get',
+			async:false,
+			crossDomain: true,
+	        xhrFields: {
+	            withCredentials: true
+	         },
+	        headers: {  'Access-Control-Allow-Origin': '*' },
+			complete:function(data, textStatus){
+				var d = data.status;
+				if (d == 200){
+					var d = data.status;
+					if (d == 200){
+						var div = document.getElementById('table-body'); 
+						div.innerHTML = div.innerHTML + 
+						 "<tr>"+
+						 "<td class=\"col-sm-8 col-md-6\">"+
+						 "</td>"+
+                        "<td class=\"col-sm-8 col-md-6\">"+
+                      	"<h4 class=\"media-heading\" style=\"margin-left:50px;\">  <strong>"+data.responseJSON.name+"</strong></h4>"+
+                       "</td>"+
+                       " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.address.country +"</h5>"+
+                       " </td>"+
+                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong>"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.address.city+"</h5>"+
+                       "</td>"+
+                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong>"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.address.street+"</h5>"+
+                       "</td>"+
+                       " <td class=\"col-sm-1 col-md-1\">"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.address.streetNumber+"</h5>"+
+                       " </td>"+
+                       " <td class=\"col-sm-1 col-md-1\">"+
+                       "  <h5 class=\"media-heading\">  <strong></strong> " + data.responseJSON.rate+"</h5>"+
+                       " </td>"+
+	                    "</tr>";
+	                    
+						imgDiv.innerHTML = imgDiv.innerHTML + "<img style=\"width:180px;height:200px;\" src=\""+data.responseJSON.images[0].imageUrl+"\">"; 
+					}else if(d == 404) {
+					}
+				}else if(d == 404) {
+					
+				}
+			},
+			error:function(){}
+		 });
+		
+			$.ajax({
+				url:'http://localhost:8080/review/'+findGetParameter("id"),
+				type:'get',
+				async:false,
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				complete:function(data, textStatus){
+					var d = data.status;
+					if (d == 200){
+						var div = document.getElementById('table-body2'); 
+						div = "";
+						for(var i = 0; i < data.responseJSON.length; i++) {
+							div.innerHTML = div.innerHTML + 
+							 "<tr id=\"reivew"+data.responseJSON[i].id+"\">"+
+	                        "<td class=\"col-sm-8 col-md-6\">"+
+	                       " <div class=\"media\">"+
+	                           " <div class=\"media-body\">"+
+	                             "  <h4 class=\"media-heading\"> <strong>Comment text </strong>: "+data.responseJSON[i].comment+"</h4>"+
+	                             "  <h4 class=\"media-heading\"> <strong>Grade </strong>: "+data.responseJSON[i].grade+"</h4>"+
+	                            "</div>"+
+	                        "</div></td>"+
+	                       " <td class=\"col-sm-1 col-md-1\" style=\"text-align: center\">"+
+	                       " </td>"+
+	                       " <td class=\"col-sm-1 col-md-1 text-center\"><strong></strong></td>"+
+	                       " <td class=\"col-sm-1 col-md-1\">"+
+	                       " </td>"+
+	                    "</tr><hr>";
+						}
+					}else if(d == 404) {
+					}
+				},
+				error:function(){}
+			 }); 
+		
+		
+		$("html").removeClass('js');
+	})
+	
+	
+	function findGetParameter(parameterName) {
+	    var result = null,
+	        tmp = [];
+	    location.search
+	        .substr(1)
+	        .split("&")
+	        .forEach(function (item) {
+	          tmp = item.split("=");
+	          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+	        });
+	    return result;
+	}
+	
+	function logout() {
+		var r = confirm("Are you sure?");
+		if (r == true) {
+			$.ajax({
+				url:'http://localhost:8080/user/logout?u=user',
+				type:'get',
+				crossDomain: true,
+		        xhrFields: {
+		            withCredentials: true
+		         },
+		        headers: {  'Access-Control-Allow-Origin': '*' },
+				complete:function(data, textStatus){
+					if (data.status == 200) {
+						window.location.href = "/";
+					}
+				}
+			});
+		}
+	}
+	
+	function check() {
+		var d1 = document.getElementById('rateInput').value;
+		var d2 = document.getElementById('commentTxt').value;
+		
+		var btn = document.getElementById('leaveReviewButton').value;
+		
+		var startDate = new Date(d1);
+		var endDate = new Date(d2);
+		console.log(d1);
+		console.log(d2);
+		console.log(d1 == '');
+		console.log(d1 == null);
+		if (d1 == '' || d2 == '') {
+			btn.disabled = true;
+		}else {
+			$('#leaveReviewButton').removeAttr('disabled');
+			
+		}
+	}
+</script>
+</head>
+<body>
+		
+	<div class="container-fluid" style="overflow:auto;">
+		<div class="row">
+			<nav class="navbar navbar-default navbar-fixed-top">
+			    <div class="navbar-header" style="margin-left: 30px;margin-right: 30px;">
+			      <a class="navbar-brand hacked-font">Booking</a>
+			    </div>
+			    <div id="navbar" class="navbar-collapse collapse">
+			      <ul class="nav navbar-nav navbar-left">
+			        <li ><a href="/">Hotels</a></li>
+			        <li class="user"><a href="reservations.html">Reservations</a></li>
+			        <li class="user"><a href="messaging-history.html">Chat history</a></li>
+			      </ul>
+			      <ul class="nav navbar-nav navbar-right">
+			      	<li class="notlogged" style="margin-right: 30px;"><a href="login.html"><span class="glyphicon glyphicon-user"></span> Login</a></li>
+			      	<li class="notlogged" style="margin-right: 30px;"><a href="register.html"><span class="glyphicon glyphicon-user"></span> Register</a></li>
+			        <li class="logged" style="margin-right: 30px;"><a onclick="logout()"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+			      </ul>
+			    </div>
+			</nav>
+		</div>
+		<div class="row" style="margin-top: 60px;">
+	    	<div class="col-md-3">
+	    		<div class="col-lg-12" id="imgDiv">
+	    			
+	    		</div>
+	    	</div>
+	    	<div class="col-md-9" >
+	    		<div class="col-lg-12">
+	    			 <table class="table table-hover" id="table-content">
+		                <thead>
+		                    <tr>
+		                        <th>Accomodation Data</th>
+		                        <th style="margin-right:50px;"' class="text-center"> Name</th>
+		                        <th class="text-center"> Country</th>
+		                        <th class="text-center"> City</th>
+		                        <th class="text-center"> Street</th>
+		                        <th class="text-center"> Street Number</th>
+		                        <th class="text-center"> Raiting</th>
+		                        <th> </th>
+		                    </tr>
+		                </thead>
+		                <tbody id="table-body">
+		                	
+		                </tbody>
+		            </table>
+	    		</div>
+	    	</div>
+    	</div>
+    	<div class="row" style="margin-top:50px;">
+	        <div class="col-sm-12 col-md-10 col-md-offset-1">
+	            <table class="table table-hover">
+	                <thead>
+	                    <tr>
+	                        <th><h2>Comments</h2></th>
+	                        <th></th>
+	                        <th class="text-center"></th>
+	                        <th class="text-center"></th>
+	                        <th> </th>
+	                    </tr>
+	                </thead>
+	                <tbody id="table-body2">
+	                </tbody>
+	            </table>
+	        </div>
+    	</div>
+    	
+	</div>
+
+</body>
+</html>
